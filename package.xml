@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>simulation_test</name>
+  <version>0.0.0</version>
+  <description>The simulation_test package</description>
+
+  <maintainer email="j.s.probst@student.tudelft.nl">johannaprobst</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <exec_depend>roscpp</exec_depend>
+
+  <!-- 
+  List additional package dependencies for executing and building the simple_control project
+  -->
+  <build_depend>geometry_msgs</build_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <build_depend>mavros_msgs</build_depend>
+  <exec_depend>mavros_msgs</exec_depend>
+
+  <export>
+
+  </export>
+  </package>
