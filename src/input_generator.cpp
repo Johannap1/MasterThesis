@@ -28,13 +28,13 @@ int INPUT::prbs_gen(){
 
 double INPUT::input(ros::Time now, ros::Time t_prbs){
     switch(_inp_type){
-        case 1:
+        case 0:
         ROS_INFO_ONCE("Generating step signal");
             if((now-t_prbs)>ros::Duration(_step_time)){
                 _u = 1;
             }
             break;
-        case 2:
+        case 1:
         ROS_INFO_ONCE("Generating PRBS signal");
             if(_prbs){
                 int count = prbs_gen();
