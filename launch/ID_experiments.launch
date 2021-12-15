@@ -1,0 +1,43 @@
+
+<launch>
+
+<arg name="INP" default="1" />
+<arg name="CTR" default="0" />
+<arg name="EXP" default="2" />
+<arg name="ALT" default="2" />
+<arg name="time_now" default="temp" /> <!-- roslaunch simulation_test ID_experiments.launch time_now:=$(date +%Y-%m-%d-%H-%M-%S) -->
+
+<group ns="nxp_drone_0">
+	<node
+	pkg="simulation_test"
+	type="offboard_control_att"
+	name="offboard_control_att"
+	output="screen"
+	>
+	<param name="input_type" value="$(arg INP)"/> <!--choose: STEP = 0, PRBS = 1, val = 2, val_sin = 3, linear = 4-->
+	<param name="control_type" value="$(arg CTR)"/> <!--choose: ATT= 0, POS = 1-->
+	<param name="experiment_type" value="$(arg EXP)"/> <!--choose: ROLL = 0, PITCH = 1, YAW = 2, YAW_RATE = 3, VZ = 4, Thrust = 5-->
+	<param name="altitude_setpoint" value="$(arg ALT)"/>
+	</node>
+
+	<node
+	pkg="rosbag"
+	name="record"
+	type="record"
+	args="-O $(find simulation_test)/rosbag/$(arg time_now)-$(arg INP)-$(arg CTR)-$(arg EXP).bag 
+		mavros/setpoint_raw/local 
+		mavros/setpoint_raw/attitude 
+		mavros/setpoint_raw/target_local 
+		mavros/setpoint_raw/target_attitude
+		mavros/local_position/pose
+		mavros/local_position/velocity_body
+		mavros/imu/data
+		"
+	/>
+
+
+</group>
+
+</launch>
+
+

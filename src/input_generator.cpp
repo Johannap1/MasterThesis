@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <thread>
 #include <chrono> 
+#include <math.h> 
 
 INPUT::INPUT(int inp_type, double max_freq, double min_freq, double samp_freq, double step_time):
     _inp_type(inp_type),
@@ -26,6 +27,8 @@ int INPUT::prbs_gen(){
     return rand_t;
 }
 
+double t_sec;
+
 double INPUT::input(ros::Time now, ros::Time t_prbs){
     switch(_inp_type){
         case 0:
@@ -39,7 +42,7 @@ double INPUT::input(ros::Time now, ros::Time t_prbs){
             if(_prbs){
                 int count = prbs_gen();
                 _d = (count/_samp_freq);
-                std::cout<<count<<","<<_d<<std::endl;
+                //std::cout<<count<<","<<_d<<std::endl;
                 _prbs = false;
                 _update_time = false;
             }
@@ -54,6 +57,36 @@ double INPUT::input(ros::Time now, ros::Time t_prbs){
                 _prbs = true;
                 _update_time = true;
             }
+            std::cout<<_u<<std::endl;
+            break;
+        case 2:
+        ROS_INFO_ONCE("Generating random validation signal");
+            if(_prbs){
+                int count = prbs_gen();
+                _d = (count/_samp_freq);
+                //std::cout<<count<<","<<_d<<std::endl;
+                _prbs = false;
+                _update_time = false;
+            }
+            if((now-t_prbs)>ros::Duration(_d)){
+                double randnumb = ((std::rand()%200)-100.0)/100.0;
+                std::cout<<randnumb<<","<<_d<<std::endl;
+                _u = randnumb;
+                _prbs = true;
+                _update_time = true;
+            }
+            break;
+        case 3:
+        ROS_INFO_ONCE("Generating sinusoidal validation signal");
+            t_sec = (now-t_prbs).toSec();
+            _u = sin(10*t_sec);
+            std::cout<<_u<<std::endl;
+            break;
+        case 4:
+        ROS_INFO_ONCE("Increasing input linearly");
+            t_sec = (now-t_prbs).toSec();
+            _u = t_sec;
+            std::cout<<_u<<std::endl;
             break;
     }
     return _u;
