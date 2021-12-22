@@ -20,3 +20,8 @@ title(file_name)
 xlabel("time [s]")
 ylabel("amplitude [rad/s]")
 saveas(gcf,image_path)
+
+%% Store the data in right format
+
+Ts = 0.02;
+data = iddata(pitch_sys,pitch_sp,Ts);

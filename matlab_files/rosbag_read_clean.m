@@ -2,15 +2,15 @@ clc
 clear all
 
 %% Load the files 
-bag = rosbag("Yaw_Exp/2021-12-15-17-46-46-1-0-2.bag");
-
-% Extract experiment number
+bag = rosbag("Roll_Exp/2021-12-22-15-23-03-2-1-0.bag");
+% Extract path and experiment type
 path = extractBefore(bag.FilePath,".bag");
 exp_ = str2double(path(end));
+%exp_ = 5; %Override in case of hovering experiment
 
 % Depending on experiment load different files
 switch exp_
-    case 2
+    case {0,1,2}
         % Load the setpoint
         bSel = select(bag,'Topic','mavros/setpoint_raw/target_attitude');
         ts_sp = timeseries(bSel,...
@@ -46,14 +46,39 @@ switch exp_
             'Twist.Angular.X',...
             'Twist.Angular.Y',...
             'Twist.Angular.Z');
+    case 5
+        % Load the setpoint
+        bSel = select(bag,'Topic','mavros/setpoint_raw/target_attitude');
+        ts_sp = timeseries(bSel,...
+            'Header.Stamp.Sec',...
+            'Header.Stamp.Nsec',...
+            'Thrust');
+        % Load the measured data
+        bSel = select(bag,'Topic','mavros/imu/data'); 
+        ts_meas= timeseries(bSel,...
+           'Header.Stamp.Sec',...
+           'Header.Stamp.Nsec',...
+           'LinearAcceleration.Z');
 end
 
-%% Extract time stamp
-t_sp = readtime(ts_sp);
-t_meas = readtime(ts_meas);
+%% Extract time & data
+
+% time stamp
+% TODO: take care of the fact that the two time stamps do not match
+[t_sp, t_meas] = readtime(ts_sp,ts_meas);
 
 % Extract the data 
 switch exp_
+    case 0
+        euler_sp = q2e(ts_sp.Data(:,3:6));
+        data_sp = euler_sp(:,1);
+        euler_meas = q2e(ts_meas.Data(:,3:6));
+        data_meas = euler_meas(:,1);
+    case 1
+        euler_sp = q2e(ts_sp.Data(:,3:6));
+        data_sp = euler_sp(:,2);
+        euler_meas = q2e(ts_meas.Data(:,3:6));
+        data_meas = euler_meas(:,2);
     case 2
         euler_sp = q2e(ts_sp.Data(:,3:6));
         data_sp = euler_sp(:,3);
@@ -62,15 +87,33 @@ switch exp_
     case 3
         data_sp = ts_sp.Data(:,4);
         data_meas = ts_meas.Data(:,4);
+    case 5
+        data_sp = ts_sp.Data(:,3);
+        data_meas = ts_meas.Data(:,3);
 end
+
+%% Yaw drift investigation 
+% 
+% figure(1)
+% plot(t_sp, euler_sp);
+% hold on 
+% plot(t_meas, euler_meas(:,3));
+% legend('Roll_sp','Pitch_sp','Yaw_sp','Yaw')
+
+%% Interpolate the data and reset time
+
+data_meas_interp = interp1(t_meas, data_meas, t_sp);
+t_meas = t_meas -t_meas(1);
+t_sp = t_sp - t_sp(1);
 
 %%  Plot the data
 
 % TODO: select start and end x-pos(time that has to be extracted) and press
 % ENTER when done
-figure(1)
+figure(2)
 hold on
 plot(t_meas, data_meas)
+plot(t_sp, data_meas_interp)
 plot(t_sp, data_sp)
 
 [x,y] = ginput;
@@ -78,29 +121,31 @@ t_start = round(x(1));
 t_end = round(x(2));
 
 %% Cut the data accordingly
+
 Ts = round(mean(t_sp(2:end)-t_sp(1:end-1)),2);
-[t_sp, data_sp] = cutdata(t_sp, data_sp, t_start, t_end, Ts);
-[t_meas, data_meas] = cutdata(t_meas, data_meas, t_start, t_end, Ts);
+[t_sp, data_meas_interp, data_sp] = cutdata(t_meas, data_meas_interp, data_sp, t_start, t_end, Ts);
 
 %% plot again to confirm
-figure(2)
+figure(3)
 hold on 
 plot(t_sp, data_sp)
-plot(t_meas, data_meas)
+plot(t_sp, data_meas_interp)
 
 %% Save the experiment data
-
-save(path,'t_sp', 't_meas', 'data_sp', 'data_meas')
+data_meas = data_meas_interp;
+save(path,'t_sp','data_sp', 'data_meas')
 
 %% Functions
-function time = readtime(timeseries)
-    time = timeseries.Data(:,1)+timeseries.Data(:,2)*10^(-9);
-    time = time - time(1);
+
+function [time_sp, time_meas] = readtime(timeseries_sp, timeseries_meas)
+    time_sp = timeseries_sp.Data(:,1)+timeseries_sp.Data(:,2)*10^(-9);
+    time_meas = timeseries_meas.Data(:,1)+timeseries_meas.Data(:,2)*10^(-9);
 end
 
-function [time, data]= cutdata(time, data, t_start, t_end, Ts)
+function [time, data1, data2]= cutdata(time, data1, data2, t_start, t_end, Ts)
     time = time(t_start/Ts:t_end/Ts) - time(t_start/Ts);
-    data = data(t_start/Ts:t_end/Ts);
+    data1 = data1(t_start/Ts:t_end/Ts);
+    data2 = data2(t_start/Ts:t_end/Ts);
 end
 
 function euler = q2e(quatseries)

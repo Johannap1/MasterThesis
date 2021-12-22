@@ -69,7 +69,7 @@ double INPUT::input(ros::Time now, ros::Time t_prbs){
                 _update_time = false;
             }
             if((now-t_prbs)>ros::Duration(_d)){
-                double randnumb = ((std::rand()%200)-100.0)/100.0;
+                double randnumb = ((std::rand()%1000)-500.0)/500.0;
                 std::cout<<randnumb<<","<<_d<<std::endl;
                 _u = randnumb;
                 _prbs = true;
@@ -79,7 +79,7 @@ double INPUT::input(ros::Time now, ros::Time t_prbs){
         case 3:
         ROS_INFO_ONCE("Generating sinusoidal validation signal");
             t_sec = (now-t_prbs).toSec();
-            _u = sin(10*t_sec);
+            _u = sin(_max_freq*t_sec);
             std::cout<<_u<<std::endl;
             break;
         case 4:
@@ -88,6 +88,11 @@ double INPUT::input(ros::Time now, ros::Time t_prbs){
             _u = t_sec;
             std::cout<<_u<<std::endl;
             break;
+        case 5:
+        ROS_INFO_ONCE("Hovering");
+            _u = 0;
+            break;
+
     }
     return _u;
 }

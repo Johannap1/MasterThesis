@@ -44,11 +44,20 @@ const std::string PARAM_NAME1= "~input_type";
 const std::string PARAM_NAME2= "~control_type";
 const std::string PARAM_NAME3= "~experiment_type";
 const std::string PARAM_NAME4= "~altitude_setpoint";
+const std::string PARAM_NAME5= "~x_setpoint";
+const std::string PARAM_NAME6= "~y_setpoint";
+const std::string PARAM_NAME7= "~velocity_setpoint";
+const std::string PARAM_NAME8= "~max_frequency";
+const std::string PARAM_NAME9= "~min_frequency";
 int inp_type;
 int control_type;
 int exp_type;
 double alt_sp;
-
+double x_sp;
+double y_sp;
+double vel_sp;
+double max_freq;
+double min_freq;
 
 int main(int argc, char **argv)
 {
@@ -117,19 +126,44 @@ int main(int argc, char **argv)
 		ROS_FATAL_STREAM("could not get altitude setpoint");
 		exit(1);
 	}
+    ok = ros::param::get(PARAM_NAME5, x_sp);
+	if(!ok) {
+		ROS_FATAL_STREAM("could not get x position setpoint");
+		exit(1);
+	}
+    ok = ros::param::get(PARAM_NAME6, y_sp);
+	if(!ok) {
+		ROS_FATAL_STREAM("could not get y position setpoint");
+		exit(1);
+	}
+    ok = ros::param::get(PARAM_NAME7, vel_sp);
+	if(!ok) {
+		ROS_FATAL_STREAM("could not get velocity setpoint");
+		exit(1);
+	}
+    ok = ros::param::get(PARAM_NAME8, max_freq);
+	if(!ok) {
+		ROS_FATAL_STREAM("could not get max frequency");
+		exit(1);
+	}
+    ok = ros::param::get(PARAM_NAME9, min_freq);
+	if(!ok) {
+		ROS_FATAL_STREAM("could not get min frequency");
+		exit(1);
+	}
 
-    //Safety constraints. TODO:adjust according to the lab dimensions
-    int max_x = 10;
-    int max_y = 10;
-    int max_z = 20;
+    //Safety constraints 
+    double max_x = 3.5;
+    double max_y = 3.5;
+    double max_z = 7.5;
     bool landing = false; 
 
     //Position setpoint for takeoff
     bool takeoff = true;
     mavros_msgs::PositionTarget pose;
     pose.coordinate_frame = 1;
-    pose.position.x = 0;
-    pose.position.y = 0;
+    pose.position.x = x_sp;
+    pose.position.y = y_sp;
     pose.position.z = alt_sp;
 
     //Initialize landing Command
@@ -143,6 +177,7 @@ int main(int argc, char **argv)
     double v[3]={0.0, 0.0, 0.0}; 
     double v_norm=1; // TODO: sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
     double theta=0; 
+
     mavros_msgs::AttitudeTarget cmd_att;
     cmd_att.header.stamp = ros::Time::now();
     cmd_att.header.frame_id = 1;
@@ -172,7 +207,7 @@ int main(int argc, char **argv)
     mavros_msgs::CommandBool arm_cmd;
     arm_cmd.request.value = true;
 
-    //record a bunch of times (TODO: check which ones are actually used)
+    //initialize a bunch of time steps
     ros::Time last_request = ros::Time::now();
     ros::Time time_pid = ros::Time::now();
     ros::Time time_inp = ros::Time::now();
@@ -181,21 +216,23 @@ int main(int argc, char **argv)
     PID pid=PID(1.f, -1.f, 0.9, 0.1, 0.5, 1.f, 10.f, 0.001, 0.1);
 
     //Initialize Input generator
-    double max_freq = 0.5;//4; //2,10
-    double min_freq = 0.1;//0.8; //0.8 0.4,12
+    //double max_freq = 0.2;//4; //2,10
+    //double min_freq = 0.2; //0.1;//0.8; //0.8 0.4,12
     double samp_freq = 50.f;
     double step_time = 5.f;
     INPUT input=INPUT(inp_type, max_freq, min_freq, samp_freq, step_time);
     bool update_time = true;
-    std::srand(time(0)); //seed ranom number sequence
+    std::srand(time(0)); //seed random number sequence
 
     //Set variables for experiment generator 
     double max_roll = 12*3.1415926535897932/180; //rad
     double max_pitch = 12*3.1415926535897932/180; //rad
     double max_yaw = 120*3.1415926535897932/180; //rad
-    double max_yaw_rate = 200*3.1415926535897932/180; //rad/s
+    double max_yaw_rate = 20*3.1415926535897932/180; //rad/s
     double max_vz = 1; //m/s
     double att_to_vel = 10;
+    double max_vel_x = vel_sp;
+    double max_vel_y = vel_sp;
 
     while(ros::ok()){
         if( current_state.mode != "OFFBOARD" &&
@@ -288,7 +325,7 @@ int main(int argc, char **argv)
                     case 5:
                         v[0]=1.0; 
                         theta = 0;
-                        cmd_att.thrust = 0.2*u+0.67;
+                        cmd_att.thrust = 0.1*u +0.67; //0.05*u+0.6754;
                         break;
                 }
 
@@ -307,12 +344,12 @@ int main(int argc, char **argv)
                     case 0: 
                         pose.position.x = NAN;
                         pose.position.y = NAN;
-                        pose.velocity.y = -u*max_roll*att_to_vel;
+                        pose.velocity.y = -u*max_vel_y;  //max_roll*att_to_vel;
                         break;
                     case 1:
                         pose.position.x = NAN;
                         pose.position.y = NAN;
-                        pose.velocity.x = u*max_pitch*att_to_vel;
+                        pose.velocity.x = u*max_vel_x; //max_pitch*att_to_vel;
                         break;
                     case 2:
                         pose.yaw = u*max_yaw;

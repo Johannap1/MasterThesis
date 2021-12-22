@@ -1,7 +1,10 @@
-%% Load the files 
-bag = rosbag("Yaw_Exp/2021-12-15-17-06-52-0-0-2.bag");
+clc 
+clear all
 
-% Extract experiment number
+%% Load the files 
+bag = rosbag("Yaw_Exp/2021-12-15-17-46-46-1-0-2.bag");
+
+% Extract path and experiment type
 path = extractBefore(bag.FilePath,".bag");
 exp_ = str2double(path(end));
 
@@ -22,10 +25,9 @@ switch exp_
         ts_meas = timeseries(bSel,...
             'Header.Stamp.Sec',...
             'Header.Stamp.Nsec',...
-            'Pose.Orientation.X',...
-            'Pose.Orientation.Y',...
-            'Pose.Orientation.Z',...
-            'Pose.Orientation.Z',...
+            'Pose.Orientation.X', ...
+            'Pose.Orientation.Y', ...
+            'Pose.Orientation.Z', ...
             'Pose.Orientation.W');
     case 3
         % Load the setpoint
@@ -46,15 +48,18 @@ switch exp_
             'Twist.Angular.Z');
 end
 
-%% Extract time stamp
-t_sp = readtime(ts_sp);
-t_meas = readtime(ts_meas);
+%% Extract time & data
+
+% time stamp
+[t_sp, t_meas] = readtime(ts_sp,ts_meas);
 
 % Extract the data 
 switch exp_
     case 2
-        euler_sp = q2e(t_sp.Data(:,3:6));
-        data_sp =
+        euler_sp = q2e(ts_sp.Data(:,3:6));
+        data_sp = euler_sp(:,3);
+        euler_meas = q2e(ts_meas.Data(:,3:6));
+        data_meas = euler_meas(:,3);
     case 3
         data_sp = ts_sp.Data(:,4);
         data_meas = ts_meas.Data(:,4);
@@ -69,16 +74,17 @@ hold on
 plot(t_meas, data_meas)
 plot(t_sp, data_sp)
 
-%[x,y] = ginput;
+[x,y] = ginput;
 t_start = round(x(1));
 t_end = round(x(2));
 
 %% Cut the data accordingly
+
 Ts = round(mean(t_sp(2:end)-t_sp(1:end-1)),2);
 [t_sp, data_sp] = cutdata(t_sp, data_sp, t_start, t_end, Ts);
 [t_meas, data_meas] = cutdata(t_meas, data_meas, t_start, t_end, Ts);
 
-%% plot again to confirm
+% plot again to confirm
 figure(2)
 hold on 
 plot(t_sp, data_sp)
@@ -89,8 +95,10 @@ plot(t_meas, data_meas)
 save(path,'t_sp', 't_meas', 'data_sp', 'data_meas')
 
 %% Functions
-function time = readtime(timeseries)
-    time = timeseries.Data(:,1)+timeseries.Data(:,2)*10^(-9);
+
+function [time_sp, time_meas] = readtime(timeseries_sp, timeseries_meas)
+    time_sp = timeseries_sp.Data(:,1)+timeseries_sp.Data(:,2)*10^(-9);
+    time_meas = timeseries_sp.Data(:,1)+timeseries_sp.Data(:,2)*10^(-9);
     time = time - time(1);
 end
 
