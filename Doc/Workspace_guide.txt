@@ -1,0 +1,55 @@
+Workspace (~/uav_mpcc):
+- Create workspace and clone repositories:
+mkdir -p uav_mpcc/src
+cd ~/uav_mpcc/src
+catkin_init_workspace
+cd ~/uav_mpcc
+catkin init
+cd ~/uav_mpcc/src
+git clone git@github.com:dbenders1/drone_toolbox.git
+git clone -b drone git@github.com:dbenders1/lmpcc.git
+git clone git@github.com:bbrito/lmpcc_msgs.git
+git clone git@github.com:oscardegroot/ros-bridge.git
+- For prius_description: copy-paste prius_description.zip, extract and remove zip file
+- For PX4-Autopilot run:
+git clone git@github.com:dbenders1/PX4-Autopilot.git
+cd PX4-Autopilot
+git remote add upstream git@github.com:PX4/PX4-Autopilot.git
+git checkout hovergames_drone
+cd Tools/sitl/gazebo
+git clone git@github.com:dbenders1/PX4-SITL_gazebo.git sitl_gazebo
+cd Tools/sitl_gazebo
+git remote add upstream git@github.com:PX4/PX4-SITL_gazebo.git
+cd ~/uav_mpcc/src/PX4-Autopilot
+git submodule update --init --recursive
+cd Tools/sitl_gazebo
+git checkout hovergames_drone
+cd ~/uav_mpcc
+sudo apt install ros-noetic-mavros ros-noetic-mavros-extras
+wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+sudo bash ./install_geographiclib_datasets.sh
+- Configure the catkin workspace workspace using the following commands:
+catkin config --cmake-args -DCMAKE_BUILD_TYPE=Debug (for debugging code, to reset use "catkin config --no-cmake-args" or "catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release")
+catkin config --blacklist px4 (ensure px4 package is not built within the catkin workspace; it has its own make instructions)
+sudo apt-get install ros-noetic-robot-localization
+catkin build
+- Now source ROS, the workspace and PX4-Autopilot by including the following lines in ~./bashrc:
+source /opt/ros/noetic/setup.bash
+source ~/uav_mpcc/devel/setup.bash
+source ~/setup_px4.sh
+
+setup_px4.sh has the following content:
+"""
+#!/bin/bash
+
+cur_dir=$(pwd)
+PX4_dir=~/uav_mpcc/src/PX4-Autopilot
+
+cd $PX4_dir
+DONT_RUN=1 make px4_sitl_default gazebo >/dev/null
+cd ${cur_dir}
+
+source $PX4_dir/Tools/setup_gazebo.bash $PX4_dir $PX4_dir/build/px4_sitl_default >/dev/null
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$PX4_dir
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$PX4_dir/Tools/sitl_gazebo
+"""

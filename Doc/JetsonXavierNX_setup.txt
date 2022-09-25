@@ -1,0 +1,49 @@
+Setup of the Jetson module to use with drone running PX4
+
+Components needed:
+- Jetson Xavier NX + power cable
+- Additional screen (HDMI or DisplayPort), keyboard and mouse (USB)
+- USB to serial adapter
+- Powered drone running PX4
+- SD or SSD card with at least 32GB space
+- JST GH connector with 4 pins to serial adapter
+- (for ground control: WIFI router)
+
+Setup:
+1) Download SD card image for Xavier NX from https://developer.nvidia.com/embedded/jetpack
+2) Follow the instructions on https://developer.nvidia.com/embedded/learn/get-started-jetson-xavier-nx-devkit#write to write image to the microSD Card
+3) Insert the SD card into the Jetson and follow the steps described under setup and first boot here: https://developer.nvidia.com/embedded/learn/get-started-jetson-xavier-nx-devkit#setup
+ATTENTION: Enable automatic login without password which will make shell script in Startup Applications Preferences easier
+4) If you want to use an SSD card, to set it up, follow the instructions on: https://www.jetsonhacks.com/2020/05/29/jetson-xavier-nx-run-from-ssd/
+5) After logging in, install ROS melodic following these steps: http://wiki.ros.org/melodic/Installation/Ubuntu. Depening on disk space choose desktop or desktop-full version.
+6) Install mavros, typing: 
+	sudo apt install ros-melodic-mavros ros-melodic-mavros-extras
+	wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+	sudo bash ./install_geographiclib_datasets.sh
+7) Bind a static name with the USB to serial adapter following the instructions on: https://unix.stackexchange.com/questions/66901/how-to-bind-usb-device-under-a-static-name and give it *yourname*. IDProduct and IDVendor can be found using 
+	lsusb - to list vendorID and product
+	sudo gedit /etc/udev/rules.d/99-usb-serial.rules - to make new file
+	copy into the file: SUBSYSTEM=="tty", ATTRS{idVendor}=="1234", ATTRS{idProduct}=="5678", SYMLINK+="your_device_name"
+	sudo udevadm trigger - to load the new rule
+	ls -l /dev/your_device_name - to verify
+6) Find the px4.launch file in the mavros launch files (e.g. using roscd mavros, cd launch)
+Setting up the serial connection:
+8) Copy the px4.launch file to another file px4_uart.launch
+9) Change the first line of your copied file to: <arg name="fcu_url" default="/dev/*yourname*:921600" /> (The number indicated the baudrate) and save file
+10) Power the drone and using the QGroundControl software set
+	MAV_2_CONFIG = TELEM 2
+	MAV_2_MODE = Onboard
+	MAV_2_RATE= 80000 Bytes/s
+	(TIP: This value might have to be tuned/reduced in the event of message losses.)
+	MAV_2_FORWARD = True
+	SER_TEL2_BAUD = 921600 baud
+11) Run px4_uart.launch (to check that it works e.g. use rostopic echo to see available px4 topics)
+Run Code Remotely:
+A) Add shell script in Startup Applications Preferences (program installed by default on Ubuntu)
+B) http://wiki.ros.org/robot_upstart (only supported for ROS)
+C) https://www.nomachine.com/getting-started-with-nomachine
+(The last two require the setup of your own wireless network using a router)
+
+Troubleshooting:
+12) Permission denied running px4_uart.launch: https://docs.qgroundcontrol.com/master/en/getting_started/download_and_install.html#ubuntu
+

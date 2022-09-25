@@ -1,0 +1,6 @@
+[ WARN] [1637233851.783038224, 3676.260000000]: CMD: Unexpected command 176, result 0 - MAV_CMD_DO_SET_MODE
+Run simulation and run QGroundControl. In Vehicle setup->Parameters set COM_RCL_EXCEPT=4
+[ WARN] [1637233922.238841414, 3746.460000000]: CMD: Unexpected command 20, result 0 - MAV_CMD_NAV_RETURN_TO_LAUNCH
+[ WARN] [1637234486.900746845, 4309.396000000]: CMD: Unexpected command 400, result 0 - PLAY_TUNE_V2
+
+
