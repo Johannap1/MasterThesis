@@ -4,11 +4,10 @@ clc;
 clear;
 %% Load the file path and settings
 % Select the correct file path
-bag = rosbag("sim_data/simplecontrol_windsimplesim_2_fans_random_tsp_path_2022-09-25-14-55-09.bag")
+bag = rosbag("sim_data/simplecontrol_windsimplesim_2_fans_random_tsp_path_2022-09-29-12-14-38.bag")
 path = extractBefore(bag.FilePath,".bag");
 % Choose sampling time
 T_s = 0.2;
-
 %%
 bSel = select(bag,'Topic','drone_hovergames/state');
 ts_state= timeseries(bSel,...
@@ -125,15 +124,15 @@ plot(t_state, vy_state_pred, '*-')
 %T_s = mean(t_state(2:end)-t_state(1:end-1)); // TODO: talk to Dennis about
 %this
 T_s = 0.05;
-vx_diff = vx_state(2:end) - vx_state_pred(1:end);
+vx_diff = vx_state(7:end) - vx_state_pred(1:end-1);
 ax_dist = vx_diff./T_s;
-vy_diff = vy_state(2:end) - vy_state_pred(1:end);
+vy_diff = vy_state(7:end) - vy_state_pred(1:end-1);
 ay_dist = vy_diff./T_s;
 
 figure(8)
-plot(t_state(2:end), ax_dist)
+plot(t_state(7:end), ax_dist)
 hold on 
-plot(t_state(2:end), ay_dist)
+plot(t_state(7:end), ay_dist)
 
 %% Plot the training data 
 
@@ -154,12 +153,12 @@ zlabel('Disturbance in vy')
 % saveas(gcf,'training_data.png')
 
 %% Turn it into a .csv file
-training_input_x = x_state(2:end);
-training_input_y = reshape(y_state(2:end), size(training_input_x));
+training_input_x = x_state(7:end);
+training_input_y = reshape(y_state(7:end), size(training_input_x));
 training_target_vx = reshape(ax_dist, size(training_input_x));
 training_target_vy = reshape(ay_dist, size(training_input_x));
 
-training_data = [training_input_x, training_input_y, training_target_vx, training_target_vy, wind_x(1:end), wind_y(1:end)];
+training_data = [training_input_x, training_input_y, training_target_vx, training_target_vy, wind_x(6:end), wind_y(6:end)];
 csvwrite(strcat(path,'.csv'),training_data)
 
 %% Functions

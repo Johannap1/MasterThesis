@@ -1,0 +1,51 @@
+TODO's:
+---------------------------------------------
+
+- Investigate the training parameters of the GP:
+	1) Kernel: Matern Kernel versus RBF Kernel plus adding a linear kernel
+	2) Sparse GP: Batch size and training epochs 
+- Investigate the parameters of active learning:
+	1) Number of points to sample at each iteration 
+	2) Iterations to perform (perhaps stop when max uncertainty is reached) 
+	2) (Radius of points to visit)
+	3) (Number of samples taken into account during exploration)
+
+- Decide on how much data to use for training: Use all samples versus only use some samples (perhaps the ones during exploration)
+- Decide on number of inducing inputs 
+- Investigate goodness of fit and uncertainty and decide on threshold that is "good enough"
+- Investigate influence of noise on performance 
+- Compare active learning with lemniscate trajectory or structured data collection to see if it is any better in terms of 
+	1) Time of exploration 
+	2) Training samlpes used 
+	3) MSE and MAE and uncertainty (max and mean)
+- Use points of TSP as indcing inputs(???)
+
+Extensions:
+-----------------------------------------------
+- Move to Gazebo and do a re-evaluation
+- Move to 3D case and do a re-evaluation
+x Test for other wind fields as well
+
+
+Planning: 
+-----------------------------------------------
+
+Idea: 
+
+1) Fix #of points, radius, #of samples and #of incduicng inputs
+2) Perform multiple iterations of active learning and check after each iteration 
+	- Optimal Kernel for the problem
+	- Optimal Hyperparametres of GP training 
+	- Influence of those on active learning 
+	Metric: MSE and MAE and uncertainty (man and mean)
+3) Choose Kernel and fix hyperparameters of GP trainig and investigate 
+	- Number of points to sample at each iteration 
+	- Iteration to perform 
+	- Radius of points to visit
+	
+	
+	-Compare matern vs linear for more information available
+	-Figure out optimal batch size for more data 
+	
+-Figure out how many iterations to make
+	
