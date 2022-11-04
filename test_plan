@@ -48,4 +48,31 @@ Idea:
 	-Figure out optimal batch size for more data 
 	
 -Figure out how many iterations to make
+
+Gazebo Simulation 
+-----------------------------------------------
+
+Currently: Wind is always pointing in opposite direction of the movement -> Predition is higher than the actual value at the next step
+
+1) Identified thrust values is wrong
+------------------------------------
+1a) Thrust value is too high -> prediction higher than realtity
+1b) THurst value is too low -> prediction lower than reality 
+
+2) Identified roll & pitch models are wrong 
+-------------------------------------------
+2ai) k is too large -> prediction higher than reality (proof?) 
+2aii) k is too small -> prediction lower than reality (proof?)
+2bi) tau is too large -> prediction lower than reality (proof?) XXXX!!!!XXXX
+2bii) tau is too small -> prediction higher than reality (proof?)
+
+3) Timing is off
+----------------
+3ai) current state is behind -> prediction lower than reality 
+3aii) current state is ahead -> prediction higher than reality
+3bi) Prediction is too far ahead -> prediction higher than reality
+3bii) Prediction is too far behind -> prediction lower than reality
+3c) Mismatch when concatenating the data -> One prediction step ahead  
+
+- Difference gets larger and larger with speed 
 	

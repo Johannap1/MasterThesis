@@ -4,12 +4,12 @@ clc;
 clear;
 %% Load the file path and settings
 % Select the correct file path
-bag = rosbag("sim_data/simplecontrol_windsimplesim_2_fans_random_tsp_path_2022-09-29-12-14-38.bag")
+bag = rosbag("lmpcc_windsimplesim_2_fans_random_tsp_path_2022-11-03-14-55-37.bag")
 path = extractBefore(bag.FilePath,".bag");
 % Choose sampling time
 T_s = 0.2;
 %%
-bSel = select(bag,'Topic','drone_hovergames/state');
+bSel = select(bag,'Topic','lmpcc/state');
 ts_state= timeseries(bSel,...
            'Header.Stamp.Sec',...
            'Header.Stamp.Nsec',...
@@ -18,7 +18,7 @@ ts_state= timeseries(bSel,...
            'Pose.Pose.Position.X',...
            'Pose.Pose.Position.Y');
 
-bSel = select(bag,'Topic','drone_hovergames/state_prediction');
+bSel = select(bag,'Topic','lmpcc/state_prediction');
 ts_state_pred = timeseries(bSel,...
            'Header.Stamp.Sec',...
            'Header.Stamp.Nsec',...
@@ -48,6 +48,13 @@ vx_state = ts_state.Data(:,3);
 vx_state_pred = ts_state_pred.Data(:,3);
 vy_state = ts_state.Data(:,4);
 vy_state_pred = ts_state_pred.Data(:,4);
+
+%% 
+figure(10)
+plot(vx_state(2:end) - vx_state_pred(1:end-1))
+% hold on 
+% plot(t_state_pred, vx_state_pred)
+%%
 
 %Extract the wind 
 wind_x = ts_wind.Data(1:end,3);
