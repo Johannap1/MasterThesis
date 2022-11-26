@@ -52,6 +52,7 @@ data_y = data['y']
 inducing_points = torch.FloatTensor(data_X[::int(data_y.shape[0]/30), :])
 model = GPModel(inducing_points=inducing_points)
 state_dict = torch.load('gpytorch_y1_model.pth')
+print(state_dict)
 model.load_state_dict(state_dict)
 
 x1 = torch.Tensor([[0, 0]])
@@ -61,6 +62,7 @@ covar = observed_pred.covariance_matrix.detach().numpy()
 lower, upper = observed_pred.confidence_region()
 lower = lower.detach().numpy()
 upper = upper.detach().numpy()
+print("mean:")
 print(mean)
 print(covar)
 

@@ -4,7 +4,7 @@ clc;
 clear;
 %% Load the file path and settings
 % Select the correct file path
-bag = rosbag("lmpcc_windsimplesim_2_fans_random_tsp_path_2022-11-03-14-55-37.bag")
+bag = rosbag("lmpcc_windsimplesim_nominal_model_plus_wind_2022-11-07-10-41-43.bag")
 path = extractBefore(bag.FilePath,".bag");
 % Choose sampling time
 T_s = 0.2;
@@ -49,10 +49,70 @@ vx_state_pred = ts_state_pred.Data(:,3);
 vy_state = ts_state.Data(:,4);
 vy_state_pred = ts_state_pred.Data(:,4);
 
+%% Load the file path and settings
+% Select the correct file path
+bag = rosbag("lmpcc_windsimplesim_GP_model_plus_wind_2022-11-07-10-34-29.bag")
+path = extractBefore(bag.FilePath,".bag");
+% Choose sampling time
+T_s = 0.2;
+%%
+bSel = select(bag,'Topic','lmpcc/state');
+ts_state= timeseries(bSel,...
+           'Header.Stamp.Sec',...
+           'Header.Stamp.Nsec',...
+           'Twist.Twist.Linear.X',...
+           'Twist.Twist.Linear.Y',...
+           'Pose.Pose.Position.X',...
+           'Pose.Pose.Position.Y');
+
+bSel = select(bag,'Topic','lmpcc/state_prediction');
+ts_state_pred = timeseries(bSel,...
+           'Header.Stamp.Sec',...
+           'Header.Stamp.Nsec',...
+           'Twist.Twist.Linear.X',...
+           'Twist.Twist.Linear.Y',...
+           'Pose.Pose.Position.X',...
+           'Pose.Pose.Position.Y');
+
+bSel = select(bag,'Topic','drone_hovergames/wind');
+ts_wind = timeseries(bSel,...
+           'Header.Stamp.Sec',...
+           'Header.Stamp.Nsec',...
+           'Vector.X',...
+           'Vector.Y');
+
+%% Extract time & data
+
+%Extract time
+t_state = readtime(ts_state);
+t_state_pred = readtime(ts_state_pred);
+t_wind = readtime(ts_wind);
+
+%Extract current and predicted velocities 
+x1_state = ts_state.Data(:,5);
+y1_state = ts_state.Data(:,6);
+vx_state = ts_state.Data(:,3);
+vx_state_pred = ts_state_pred.Data(:,3);
+vy_state = ts_state.Data(:,4);
+vy_state_pred = ts_state_pred.Data(:,4);
+
+%% Lemniscate 
+
+x =   [9.5,8.2058,5.6167,3.2604,1.4203,-0.13876,-1.7263,-3.6488,-6.0978,-8.6015,-9.4516,-7.7677,-5.1475,-2.8903,-1.1237,0.41722,2.0436,4.0563,6.5852,8.9405, 9.5,8.2058]
+y =  [0,2.5813,3.3543,2.6709,1.3606,-0.1387,-1.6221,-2.8618,-3.3499,-2.2245,0.55173,2.8697,3.3098,2.4605,1.0935,-0.41562,-1.8761,-3.0291,-3.2903,-1.8041, 0, 2.5813]
+
+%%
+
+figure(9)
+plot(x_state, y_state)
+hold on 
+plot(x1_state, y1_state)
+plot(x,y)
 %% 
 figure(10)
-plot(vx_state(2:end) - vx_state_pred(1:end-1))
-% hold on 
+plot((vx_state(2:end) - vx_state_pred(1:end-1))./0.05)
+hold on 
+plot(x_state)
 % plot(t_state_pred, vx_state_pred)
 %%
 
