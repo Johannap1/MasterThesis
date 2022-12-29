@@ -48,3 +48,23 @@ A = [x, xy; xy, y];
 
 
 eig(A)
+
+%% Sqrt vs Log 
+
+x = linspace(-1,1,101)
+y1 = sqrt(x)
+y2 = 2.^(0.5*(log(x.^2)/log(4)))
+
+figure(1)
+plot(x, y1)
+hold on 
+plot(x, y2)
+
+%% c2d 
+
+A = [ 0 0 1 0; 0 0 0 1; 0 0 0 0; 0 0 0 0];
+Bd = [0 0; 0 0; 1 0; 0 1];
+C = eye(4)
+D = zeros(4,2)
+sysc = ss(A, Bd, C, D);
+sysd = c2d(sysc,0.05,'zoh');

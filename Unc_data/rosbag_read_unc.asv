@@ -1,0 +1,49 @@
+clc;
+clear;
+%% Load the file path and settings
+% Select the correct file path
+bag = rosbag("lmpcc_windsimplesim_nominal_model_plus_wind_2022-12-05-15-12-20.bag")
+path = extractBefore(bag.FilePath,".bag");
+%%
+bSel = select(bag,'Topic','lmpcc/planned_trajectory');
+msgStructs = readMessages(bSel,'DataFormat','struct');
+% ts_state= timeseries(bSel,...
+%            'Header.Seq',...
+%            'Header.Stamp.Nsec',...
+%            'Poses.Header.Seq');
+% % vx_state = ts_state.Data(:,1);
+%%
+%topic_pose=select(bag,'Time',timeinterval,'Topic','lmpcc/state');
+
+%% Read data differently 
+
+x_mat = [];
+y_mat = [];
+sigma_x_mat = [];
+sigma_y_mat = [];
+sigma_xy_mat = [];
+
+for i = 1:81
+    message_x = [];
+    message_y = [];
+    sigma_x = [];
+    sigma_y = [];
+    sigma_xy = [];
+    for j = 1:20
+        message_x = [message_x,msgStructs{i,1}.Poses(j).Pose.Position.X];
+        message_y = [message_y,msgStructs{i,1}.Poses(j).Pose.Position.Y];
+        sigma_x = [sigma_x,msgStructs{i,1}.Poses(j).Pose.Orientation.X];
+        sigma_y = [sigma_y,msgStructs{i,1}.Poses(j).Pose.Orientation.Y];
+        sigma_xy = [sigma_xy,msgStructs{i,1}.Poses(j).Pose.Orientation.W];
+    end
+    x_mat = [x_mat; message_x];
+    y_mat = [y_mat; message_y];
+    sigma_x_mat = [sigma_x_mat;sigma_x];
+    sigma_y_mat = [sigma_y_mat;sigma_y];
+    sigma_xy_mat = [sigma_xy_mat;sigma_xy];
+end
+csvwrite(strcat(path,'/x_mat.csv'),x_mat);
+csvwrite(strcat(path,'/y_mat.csv'),y_mat);
+csvwrite(strcat(path,'/sigma_x_mat.csv'),sigma_x_mat);
+csvwrite(strcat(path,'/sigma_y_mat.csv'),sigma_y_mat);
+csvwrite(strcat(path,'/sigma_xy_mat.csv'),sigma_xy_mat);

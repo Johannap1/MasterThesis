@@ -27,6 +27,7 @@ class ExactGPModel(gpytorch.models.ExactGP):
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+
 def read_data(filepath):
     training_data = pd.read_csv(filepath)
     training_data_array = training_data.to_numpy()
