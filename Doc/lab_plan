@@ -1,0 +1,11 @@
+1) Get drone runnning with mpc identification experiment files to get evrything to last point 
+2) Perform two step experiments to make sure that the controller model is still accurate (store them for later)
+2) Run random path generator and collect data on quadrotor position (without any wind) 
+	x vary the wait time at position 
+	x make sure state and state prediction are recorded 
+	x also record wind prediction coded by hand
+	x change prediction model for the simulation to match 
+	- push the code 
+	- evtl use rope and kill switch 
+	- adjust bounds
+	- setup venv

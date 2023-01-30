@@ -1,0 +1,30 @@
+Meeting Dennis
+----------------------------------------
+
+- LMPCC:
+	- LMPCC implementation does not work right/ is super fragile
+	- When too far away from obstacle, implementation fails (both for exploration with GP experiment and final comparison experiment) 
+	- Cannot track reference velocity correctly
+	- Is there a better implementation/formulation somewhere?
+	- uncertainty propagation now outside the solver with ROS service call --> Where to put the uncertainty propagator & interface
+	- Soft versus hard chance constraints
+	- Timing investigation (?) - How to compare
+	- Robustness (?) 
+	
+- FORCES:
+	- Works well with wind field in x-dir (also noise)
+	- Gets stuck with wind in x-y-dir (too extreme changes ???) --> Do I have to prove that? 
+	- Rate control vs their implementation, no controller feedback (???) 
+	- What makes sense to assume as an initial uncertainty?
+	
+- GP: 
+	- Now discrete versus previously continuous - propagation actually works much better
+	- Issues with defined windfields (do that again?) 
+	- Issue with propagating the uncertainty continuous versus discrete (especially with noise) - add some noise to the model
+
+- System ID:
+	- Explain controller tuning ? 
+	
+	
+- Notation:
+	- List of symbols
