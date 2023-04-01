@@ -1,0 +1,16 @@
+<mxfile host="Electron" modified="2023-04-01T13:29:53.498Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.1.2 Chrome/106.0.5249.199 Electron/21.4.3 Safari/537.36" etag="OqbLPCGxexfEtljLGy1n" version="21.1.2" type="device">
+  <diagram name="Page-1" id="Yp44MSaWsvUIxUmvyQu_">
+    <mxGraphModel dx="1194" dy="840" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="4681" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tgwugvcD4bmxTsMDwBKw-1" value="Strcuture of Master Thesis Repository" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="30" y="50" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gAcGDhRHePu7zOrXkZx5-1" value="Doc" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="100" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
