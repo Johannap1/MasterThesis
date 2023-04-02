@@ -5,3 +5,6 @@
 [submodule "forces_resilient_planner"]
 	path = forces_resilient_planner
 	url = git@github.com:Johannap1/forces_resilient_planner
+[submodule "drone_toolbox"]
+	path = drone_toolbox
+	url = git@github.com:cor-drone-dev/drone_toolbox.git
