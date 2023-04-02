@@ -8,3 +8,6 @@
 [submodule "drone_toolbox"]
 	path = drone_toolbox
 	url = git@github.com:cor-drone-dev/drone_toolbox.git
+[submodule "lmpcc"]
+	path = lmpcc
+	url = git@github.com:dbenders1/lmpcc.git
