@@ -1,0 +1,26 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/opt/ros/noetic/include/**",
+        "/home/johanna/uav_mpcc/devel/include/**",
+        "/home/johanna/uav_mpcc/src/lmpcc/lmpcc/include/**",
+        "/home/johanna/uav_mpcc/src/lmpcc/lmpcc_tools/include/**",
+        "/home/johanna/uav_mpcc/src/local_polygon/include/**",
+        "/home/johanna/uav_mpcc/src/mav_comm/mav_msgs/include/**",
+        "/home/johanna/uav_mpcc/src/model_sim/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

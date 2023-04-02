@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<launch>
+	<!-- Record a ROS bag -->
+    <node
+	pkg="rosbag"
+	name="record"
+	type="record"
+	args="-O data.bag 
+		mavros/setpoint_raw/local 
+		mavros/setpoint_raw/attitude 
+		mavros/setpoint_raw/target_local 
+		mavros/setpoint_raw/target_attitude
+		mavros/local_position/pose
+		mavros/local_position/velocity_body
+		mavros/local_position/accel
+		mavros/imu/data
+		mavros/imu/data_raw"
+	/>
+</launch>

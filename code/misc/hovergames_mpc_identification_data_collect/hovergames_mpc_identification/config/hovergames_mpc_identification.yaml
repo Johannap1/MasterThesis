@@ -1,0 +1,48 @@
+# State machine update frequency (Hz)
+loop_frequency: 20
+
+##------------ID experiment type choices----------------##
+
+# CONTROL TYPE, choose: 'attitude' 'velocity' or 'position' or 'tuning'
+# Tuning is used for the custom PID controller to keep the drone at a constant height during attitude mode
+control_type: 'position' 
+
+# INPUT TYPE, choose:
+# step = 0, 
+# PRBS - constant magnitude = 1
+# PRBS - varying magnitude = 2
+# sinusoid = 3
+# linear = 4
+# zero = 5
+input_type: 5
+
+# EXPERIMENT_TYPE, choose:
+# (attitude/velocity/position), - means experiment choice not possible
+# roll/v_y/y = 0
+# pitch/v_x/x = 1
+# yaw = 2
+# yaw_rate = 3
+# -/v_z/z = 4
+# thrust/-/- = 5
+# random = 6
+experiment_type: 6
+
+position_setpoint: 0 #Depending on experiment choice in x,y or z 
+                     # If step is chosen in attitude mode, the drone executes the step until the position setpoint
+                     # and then turns around
+velocity_setpoint: 0 #Velocity setpoint only relevant for velocity mode
+
+# This is relevant for PRBS and sinusoid
+# For sinusoids choose min and max frequency equal
+min_frequency: 5
+max_frequency: 5
+
+# Roll and pitch setpoints (deg) (default is set to 12 deg, uncomment to change)
+# roll: 12.0
+# pitch: 12.0
+
+# Experiment duration in seconds
+experiment_duration: 60.0
+
+# Print debug information
+enable_debug: true

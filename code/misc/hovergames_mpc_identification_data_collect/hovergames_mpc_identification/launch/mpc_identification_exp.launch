@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+
+<launch>
+    <!-- Experiment settings -->
+    <arg name="sim" default="false"/>
+    <arg name="drone_name" default="hovergames"/>
+    <arg name="run_px4_control_interface" default="true"/>
+    <arg name="px4_control_interface_param_file" default="$(find px4_tools)/config/px4_control_interface_mpc_identification.yaml"/>
+    <arg name="hovergames_mpc_identification_param_file" default="$(find hovergames_mpc_identification)/config/hovergames_mpc_identification.yaml"/>
+
+    <!-- Load robot_description and publish the states on tf -->
+    <include file="$(find drone_description)/launch/drone_description.launch">
+        <arg name="drone_name" value="$(arg drone_name)"/>
+    </include>
+
+    <!-- Launch Gazebo if sim is set to true -->
+    <group if="$(arg sim)">
+        <include file="$(find drone_gazebo)/launch/gazebo_world.launch"/>
+    </group>
+
+    <!-- Launch PX4 control interface, MAVROS, PX4 SITL and spawn vehicle -->
+    <include file="$(find px4_tools)/launch/px4_tools.launch">
+        <arg name="sim" value="$(arg sim)"/>
+        <arg name="drone_name" value="$(arg drone_name)"/>
+        <arg name="run_px4_control_interface" value="$(arg run_px4_control_interface)"/>
+        <arg name="px4_control_interface_param_file" value="$(arg px4_control_interface_param_file)"/>
+    </include>
+
+    <!-- Launch MPC identification node -->
+    <node pkg="hovergames_mpc_identification" type="mpc_identification_exp_node" name="mpc_identification_exp" cwd="node" output="screen">
+        <rosparam command="load" file="$(arg hovergames_mpc_identification_param_file)"/>
+        <rosparam command="load" file="$(arg px4_control_interface_param_file)"/>
+        <param name="is_sim" value="$(arg sim)"/>
+    </node>
+
+    <node pkg="hovergames_mpc_identification" type="data_collector_node" name="data_collector" cwd="node" output="screen">
+    </node>
+
+    <!-- Launch ROS dynamic reconfigure -->
+    <node name="rqt_reconfig" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+
+     <!-- Launch pre-configured RViz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find hovergames_control)/rviz/rviz_config_lmpcc.rviz"/>
+
+    <!-- Record a ROS bag -->
+    <node pkg="rosbag" name="record" type="record"
+    args="-o id-thrust-hover.bag
+        mavros/setpoint_raw/local 
+        mavros/setpoint_raw/attitude 
+        mavros/setpoint_raw/target_local 
+        mavros/setpoint_raw/target_attitude
+        mavros/vision_pose/pose
+        mavros/local_position/pose
+        mavros/local_position/velocity_body
+        mavros/local_position/odom
+        mavros/local_position/accel
+        mavros/imu/data
+        mavros/imu/data_raw
+        mavros/battery
+        drone_hovergames/wind
+        drone_hovergames/state_prediction"
+    />
+</launch>
