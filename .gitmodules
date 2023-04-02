@@ -1,3 +1,4 @@
 [submodule "model_sim"]
 	path = model_sim
 	url = git@github.com:dbenders1/model_sim.git
+	branch = hovergames-wind
