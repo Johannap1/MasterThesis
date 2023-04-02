@@ -2,3 +2,6 @@
 	path = model_sim
 	url = git@github.com:R2CLab/simple_sim
 	branch = hovergames-wind
+[submodule "forces_resilient_planner"]
+	path = forces_resilient_planner
+	url = git@github.com:Johannap1/forces_resilient_planner
